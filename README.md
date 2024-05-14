@@ -50,6 +50,8 @@ Click "Next" when finished.
 4. *Finalize*. The name must be 16 charaters or less, so I put in my initials and some minimal abbreviations for what I'm doing. You want it to be unique so you can share it with someone else if they want to look at / debug it.  Select your project and Emulab cluster. Click "Next".
 5. *Schedule*. Put in the end time (at the least) so that someone else can use the resources after you plan to be done. Click "Finish".
 
+The setup wipes the machines and does a full install of everything on each compute node, so it takes a few minutes.
+
 ### Specify Experiment Parameters in JSON
 
 The file save_iq_w_tx_file.json specifies all Shout parameters. Start with and edit a copy of save_iq_w_tx_file.json on your local machine.
@@ -65,16 +67,10 @@ Parameters:
 - `nsamps`: number of samples to be collected. I want to have this greater than twice as long as the packet length, to make sure I get a full packet no matter what.
 - `wotxrepeat`: number of repeated sample collection runs without TX. 
 
-Then, copy the JSON file to all of the remote compute nodes.
-
-   `scp -r ./save_iq_w_tx_file.json npatwari@pc##-fort.emulab.net:/local/repository/etc/cmdfiles/save_iq_w_tx_file.json`
-   `scp -r ./QPSK_signal_2024-05-13.iq npatwari@pc##-fort.emulab.net:/local/repository/shout/save_iq_w_tx_file.json`
-
-where `pc##-fort.emulab.net` is the compute node name. Use whatever is on your list view of your compute nodes, in case they've got some other IP address.
 
 
 ### SSH into the orchestrator and clients
-Once the experiemnt is ready, go to `List View` for the node hostnames.  Each host is listed with an SSH command for you. Mine says `ssh npatwari@pc11-fort.emulab.net` in the row labelled `orch`.  This means that my username is `npatwari` and the orchestrator node is `pc11-fort.emulab.net`. There are five other `-comp` nodes, each with a hostname.  Those are my "radio hostnames".
+Once the experiemnt is ready, go to `List View` for the node hostnames.  Each host is listed with an SSH command for you. Mine says `ssh <username>@pc##-fort.emulab.net` in the row labelled `orch`.  This means that my username is `npatwari` and the orchestrator node is `pc##-fort.emulab.net`. There are five other `-comp` nodes, each with a hostname.  Those are my "radio hostnames".
 
 Hope you have some screen space! We're going to need two terminals connected to the orchestrator, and one terminal for each radio hostname.
 
@@ -101,12 +97,16 @@ Note: `tmux` allows multiple remote sessions to remain active even when the SSH 
 
 ### Editing and Uploading Files
 
-We often need to change the 1) experiment parameters `save_iq_w_tx_file.json` and 2) transmitted signal file <TX-signal.iq> after instantiating the experiment. While the contents of the repository are copied, if you want to edit the parameters file on your local machine after instatiation, you need to copy the edited files to the orchestrator and each radio host.
+We need to upload to the compute nodes the files we created on our local machine: the 1) experiment parameters `save_iq_w_tx_file.json` and 2) transmitted signal file <TX-signal.iq>.
+
+(Don't do this until the setup in "Instantiate an Experiment" is finished.)
 
 I use the following commands to do this:
 
-    scp <path to my local repo>/etc/cmdfiles/save_iq_w_tx_file.json <username>@<orch_node_hostname>:/local/repository/etc/cmdfiles/save_iq_w_tx_file.json 
-    scp <path to my local repo>/shout/QPSK_signal_2024-02-06.iq <username>@<orch_node_hostname>:/local/repository/shout/<TX signal.iq>
+   `scp -r ./save_iq_w_tx_file.json <username>@pc##-fort.emulab.net:/local/repository/etc/cmdfiles/save_iq_w_tx_file.json`
+   `scp -r ./QPSK_signal_2024-05-13.iq <username>@pc##-fort.emulab.net:/local/repository/shout/save_iq_w_tx_file.json`
+
+where `pc##-fort.emulab.net` is the compute node name. Use whatever is on your list view of your compute nodes, in case they've got some other IP address.
 
 ### Transmission and reception 
 
